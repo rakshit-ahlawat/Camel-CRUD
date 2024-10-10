@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://camel.apache.org/schema/spring"
+         xsi:schemaLocation="
+            http://camel.apache.org/schema/spring
+            https://camel.apache.org/schema/spring/camel-spring.xsd">
+
+
+        <route>
+            <from uri="rest:post:/users/add"/>
+            <to uri="direct:createUser" />
+        </route>
+
+        <route>
+            <from uri="rest:get:/users/"/>
+            <to uri="direct:getAllUsers" />
+        </route>
+
+        <route>
+            <from uri="rest:put:/users/update"/>
+            <to uri="direct:updateUser" />
+        </route>
+        <route>
+            <from uri="rest:delete:/users/delete"/>
+            <to uri="direct:deleteUser" />
+        </route>
+
+    <route id="createUserRoute">
+        <from uri="direct:createUser"/>
+        <log loggingLevel="INFO" logName="route XML" message="Creating a User"/>
+        <log message="${body}"/>
+        <to uri="kafka:myKafkaTopicCreate"/>
+    </route>
+
+    <route id="getAllUsersRoute">
+        <from uri="direct:getAllUsers"/>
+        <log loggingLevel="INFO" logName="route XML" message="Geting All Users"/>
+        <bean ref="GetUsers" method="process"></bean>
+        <log message="=${body}"/>
+        <to uri="kafka:myKafkaTopicGet"/>
+    </route>
+
+    <route id="updateUserRoute">
+        <from uri="direct:updateUser"/>
+        <log loggingLevel="INFO" logName="route XML" message="Updating User"/>
+        <log message="=${body}"/>
+        <to uri="kafka:myKafkaTopicUpdate"/>
+    </route>
+
+    <route id="deleteUserRoute">
+        <from uri="direct:deleteUser"/>
+        <log loggingLevel="INFO" logName="route XML" message="Deleting User"/>
+        <log message="=${body}"/>
+        <to uri="kafka:myKafkaTopicDelete"/>
+    </route>
+
+    <route id="consumerCreateUser">
+        <from uri="kafka:myKafkaTopicCreate"/>
+        <log loggingLevel="INFO" logName="consumerRoute XML" message="${body}"/>
+        <bean ref="CreateUser" method="process"></bean>
+    </route>
+
+    <route id="consumerGetAllUsers">
+        <from uri="kafka:myKafkaTopicGet"/>
+        <log loggingLevel="INFO" logName="route XML" message="Received message for Get All Users ${body}"/>
+    </route>
+
+    <route id="consumerUpdateUser">
+        <from uri="kafka:myKafkaTopicUpdate"/>
+        <log loggingLevel="INFO" logName="route XML" message="Received message for Update User: ${body}"/>
+        <bean ref="UpdateUser" method="process"></bean>
+    </route>
+
+    <route id="consumerDeleteUser">
+        <from uri="kafka:myKafkaTopicDelete"/>
+        <log loggingLevel="INFO" logName="route XML" message="Received message for Delete User: ${body}"/>
+        <bean ref="DeleteUser" method="process"></bean>
+    </route>
+
+
+</routes>

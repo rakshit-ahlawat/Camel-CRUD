@@ -4,6 +4,8 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.control.ActivateRequestContext;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
 import org.camel.entity.User;
 import org.camel.repository.UserRepository;
 import org.slf4j.Logger;
@@ -22,7 +24,7 @@ public class UserService {
     @Inject
     UserRepository userRepository;
 
-
+    @Produces(MediaType.APPLICATION_JSON)
     public List<User> getAllUsers() {
         logger.info("class:UserService , method:getAllUsers , message= retrieving all users");
 
